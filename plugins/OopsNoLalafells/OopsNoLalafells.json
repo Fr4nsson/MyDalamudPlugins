@@ -8,6 +8,6 @@
   "RepoUrl": "https://github.com/Fr4nsson/MyDalamudPlugins/tree/main/src/OopsNoLalafells",
   "DalamudApiLevel": 5,
   "LoadPriority": 0,
-  "IconUrl": "https://raw.githubusercontent.com/Fr4nsson/MyDalamudPlugins/main/plugins/OopsNoLalafells/icon.png",
+  "IconUrl": "https://raw.githubusercontent.com/Fr4nsson/MyDalamudPlugins/main/plugins/OopsNoLalafells/images/icon.png",
   "Punchline": "That one essential plugin no one told you about but should have."
 }
