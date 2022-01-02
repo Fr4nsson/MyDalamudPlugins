@@ -13,3 +13,10 @@ https://raw.githubusercontent.com/Fr4nsson/MyDalamudPlugins/main/pluginmaster.js
 4. Paste it on an empty line and click the <code>+</code> on the far right to add it
 5. Click <code>Save and Close</code>
 6. You can now find the plugins under <code>Available Plugins</code>
+
+## Plugins
+| Name | Description |
+|---------------|-----------------|
+| [Hide Padlock](https://github.com/Fr4nsson/MyDalamudPlugins/tree/main/src/HidePadlock) | Allows you to toggle the visibility of the padlock that is next to hotbar one.<br><br>Use /padlock to toggle visibility. |
+| [OopsNoLalafells](https://github.com/Fr4nsson/MyDalamudPlugins/tree/main/src/OopsNoLalafells) | Turn all Lalafells around you into other races. Also allows you to change your own race.<br><br>Use /nolala to open settings.<br><br>Original code (OopsAllLalafells) by Avaflow<br>https://ava.dev/ava/OopsAllLalafells |
+
