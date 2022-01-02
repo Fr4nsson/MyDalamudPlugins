@@ -53,10 +53,10 @@ Foreach-Object {
         
         if ($content.DalamudApiLevel -eq $apiLevel) {
             if ($content.RepoUrl) {
-                $table = $table + "| " + $content.Author + " | [" + $content.Name + "](" + $content.RepoUrl + ") | " + $newDesc + " |`n"
+                $table = $table + "| [" + $content.Name + "](" + $content.RepoUrl + ") | " + $newDesc + " |`n"
             }
             else {
-                $table = $table + "| " + $content.Author + " | " + $content.Name + " | " + $newDesc + " |`n"
+                $table = $table + "| " + $content.Name + " | " + $newDesc + " |`n"
             }
         }
     }
@@ -116,7 +116,7 @@ Foreach-Object {
     else
     {
     	$content | add-member -Force -Name "IsHide" -value "False" -MemberType NoteProperty
-    	# $table = $table + "| " + $content.Author + " | " + $content.Name + " | " + $content.Description + " |`n"
+    	# $table = $table + "| " + $content.Name + " | " + $content.Description + " |`n"
     }
 
     $dlCount = 0;
