@@ -164,4 +164,4 @@ Out-File -FilePath .\pluginmaster.json -InputObject $outputStr
 
 $template = Get-Content -Path mdtemplate.txt
 $template = $template + $table
-Out-File -FilePath .\plugins.md -InputObject $template
+Out-File -FilePath .\README.md -InputObject $template
