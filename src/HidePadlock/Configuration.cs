@@ -9,7 +9,9 @@ namespace HidePadlock
     {
         public int Version { get; set; }
 
-        public bool ShowLock { get; set; } = true;
+        public bool Lock_isVisible { get; set; } = true;
+
+        public float Lock_Opacity { get; set; } = 1;
 
         [NonSerialized]
         private DalamudPluginInterface? PluginInterface;
