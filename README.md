@@ -17,6 +17,6 @@ https://raw.githubusercontent.com/Fr4nsson/MyDalamudPlugins/main/pluginmaster.js
 ## Plugins
 | Name | Description |
 |---------------|-----------------|
-| [Hide Padlock](https://github.com/Fr4nsson/MyDalamudPlugins/tree/main/src/HidePadlock) | Allows you to toggle the visibility of the padlock that is next to hotbar one.<br><br>Use /padlock to toggle visibility. |
+| [Hide Padlock](https://github.com/Fr4nsson/MyDalamudPlugins/tree/main/src/HidePadlock) | Allows you to toggle the visibility of the padlock that is next to hotbar one.<br><br>Use /padlock to toggle visibility.<br>Use //padlock to open settings. |
 | [OopsNoLalafells](https://github.com/Fr4nsson/MyDalamudPlugins/tree/main/src/OopsNoLalafells) | Turn all Lalafells around you into other races. Also allows you to change your own race.<br><br>Use /nolala to open settings.<br><br>Original code (OopsAllLalafells) by Avaflow<br>https://ava.dev/ava/OopsAllLalafells |
 
