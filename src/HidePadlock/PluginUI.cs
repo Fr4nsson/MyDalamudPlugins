@@ -53,7 +53,7 @@ namespace HidePadlock
                 bool refBool = Configuration.Lock_isVisible;
                 if (ImGui.Checkbox("Show Padlock", ref refBool))
                 {
-                    Plugin.ToggleLock(true);
+                    Plugin.Lock_isVisible();
                     Configuration.Lock_isVisible = refBool;
                     Configuration.Save();
                 }
@@ -66,7 +66,7 @@ namespace HidePadlock
                     if (ImGui.DragFloat("Opacity", ref refFloat, .005f, minValue, maxValue, "%.1f"))
                     {
                         Configuration.Lock_Opacity = refFloat;
-                        Plugin.ToggleLock(false);
+                        Plugin.Lock_Opacity();
                         Configuration.Save();
                     }
                 }

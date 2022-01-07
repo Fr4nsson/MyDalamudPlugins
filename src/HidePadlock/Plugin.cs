@@ -22,6 +22,12 @@ namespace HidePadlock
         private CommandManager CommandManager { get; init; }
         private Configuration Configuration { get; init; }
 
+        private unsafe AtkUnitBase* Addon { get; set; } = null;
+        private unsafe AtkResNode* Padlock { get; set; } = null;
+
+        private const uint Padlock_NodeId = 21;
+
+
         public Plugin(
             [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
             [RequiredVersion("1.0")] GameGui gameGui,
@@ -54,46 +60,68 @@ namespace HidePadlock
             OnLoad();
         }
 
+        public unsafe bool GrabAddon()
+        {
+            if (Addon == null)
+            {
+                Addon = (AtkUnitBase*)GameGui.GetAddonByName("_ActionBar", 1);
+            }
+
+            if (Addon != null)
+            {
+                if (Padlock == null)
+                {
+                    Padlock = Addon->GetNodeById(Padlock_NodeId);
+                }
+
+                if (Padlock != null)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public unsafe void OnLoad()
         {
-            var addon = (AtkUnitBase*)GameGui.GetAddonByName("_ActionBar", 1);
-            if (addon != null)
+            if (GrabAddon())
             {
-                var padlock = addon->GetNodeById(20);
-                if (padlock != null)
-                {
-                    padlock->ToggleVisibility(Configuration.Lock_isVisible);
-                    padlock->Color.A = (byte)(255 * Configuration.Lock_Opacity);
-                }
+                Padlock->ToggleVisibility(Configuration.Lock_isVisible);
+                Padlock->Color.A = (byte)(255 * Configuration.Lock_Opacity);
             }
         }
 
-        public unsafe void ToggleLock(bool showLock)
+        public unsafe void Lock_isVisible()
         {
-            var addon = (AtkUnitBase*)GameGui.GetAddonByName("_ActionBar", 1);
-            uint nodeId = 21; // NodeId for the padlock
-
-            if (addon != null)
+            if (GrabAddon())
             {
-                var padlock = addon->GetNodeById(nodeId);
-                if (padlock != null)
-                {
-                    if (showLock)
-                    {
-                        padlock->ToggleVisibility(Configuration.Lock_isVisible = !Configuration.Lock_isVisible);
-                        PluginLog.Log($"Addon _ActionBar, Node[7], NodeId: {nodeId}, aka Padlock, IsVisible: {Configuration.Lock_isVisible}");
-                    }
-                    else
-                    {
-                        padlock->Color.A = (byte)(255 * Configuration.Lock_Opacity);
-                        PluginLog.Log($"Addon _ActionBar, Node[7], NodeId: {nodeId}, aka Padlock, Opacity: {Configuration.Lock_Opacity}");
-                    }
-                }
+                Padlock->ToggleVisibility(Configuration.Lock_isVisible = !Configuration.Lock_isVisible);
+                PluginLog.Log($"Addon _ActionBar, NodeId: {Padlock_NodeId}, aka Padlock, IsVisible: {Configuration.Lock_isVisible}");
+            }
+        }
+
+        public unsafe void Lock_Opacity()
+        {
+            if (GrabAddon())
+            {
+                Padlock->Color.A = (byte)(255 * Configuration.Lock_Opacity);
+                PluginLog.Log($"Addon _ActionBar, NodeId: {Padlock_NodeId}, aka Padlock, Opacity: {Configuration.Lock_Opacity}");
+            }
+        }
+
+        public unsafe void Lock_Restore()
+        {
+            if (GrabAddon())
+            {
+                Padlock->ToggleVisibility(true);
+                Padlock->Color.A = 255;
+                PluginLog.Log($"Addon _ActionBar, NodeId: {Padlock_NodeId}, aka Padlock, Restored to default");
             }
         }
 
         public void Dispose()
         {
+            Lock_Restore();
             PluginUi.Dispose();
             CommandManager.RemoveHandler(CommandName);
             CommandManager.RemoveHandler(CommandName2);
@@ -103,7 +131,7 @@ namespace HidePadlock
         {
             if (command == "/padlock")
             {
-                ToggleLock(true);
+                Lock_isVisible();
             }
             else if (command == "//padlock")
             {
