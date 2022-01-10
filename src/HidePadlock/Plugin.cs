@@ -1,9 +1,11 @@
-﻿using Dalamud.Game.Command;
+﻿using Dalamud.Game;
+using Dalamud.Game.Command;
 using Dalamud.Game.Gui;
 using Dalamud.IoC;
 using Dalamud.Logging;
 using Dalamud.Plugin;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using System;
 
 namespace HidePadlock
 {
@@ -17,26 +19,27 @@ namespace HidePadlock
 
         private DalamudPluginInterface PluginInterface { get; init; }
         private GameGui GameGui { get; init; }
-        private ChatGui ChatGui { get; init; }
         private PluginUI PluginUi { get; init; }
+        private Framework Framework { get; set; }
         private CommandManager CommandManager { get; init; }
         private Configuration Configuration { get; init; }
-
+        private static int MsBuilder { get; set; }
         private unsafe AtkUnitBase* Addon { get; set; } = null;
         private unsafe AtkResNode* Padlock { get; set; } = null;
 
         private const uint Padlock_NodeId = 21;
 
+        private const uint UpdateOnNumOfMs = 1000;
 
         public Plugin(
             [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
             [RequiredVersion("1.0")] GameGui gameGui,
-            [RequiredVersion("1.0")] ChatGui chatGui,
+            [RequiredVersion("1.0")] Framework framework,
             [RequiredVersion("1.0")] CommandManager commandManager)
         {
             PluginInterface = pluginInterface;
             GameGui = gameGui;
-            ChatGui = chatGui;
+            Framework = framework;
             CommandManager = commandManager;
 
             Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
@@ -57,10 +60,53 @@ namespace HidePadlock
             PluginInterface.UiBuilder.Draw += DrawUI;
             PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
 
-            OnLoad();
+            Framework.Update += FrameworkOnOnUpdateEvent;
         }
 
-        public unsafe bool GrabAddon()
+        private void FrameworkOnOnUpdateEvent(Framework framework)
+        {
+            int currentMs = 0;
+            int previousMs = currentMs;
+            currentMs = DateTime.Now.Millisecond;
+
+            int delayInMsBetweenTicks = currentMs - previousMs;
+            if (currentMs < previousMs) delayInMsBetweenTicks = 999 + currentMs - previousMs; // DateTime.Millisecond max is 999
+
+            MsBuilder += delayInMsBetweenTicks;
+
+            if (MsBuilder < 0)
+            {
+                PluginLog.LogDebug("--------------------------------------------------------------------");
+                PluginLog.LogDebug("MsBuilder was less than zero, this should not happen, resetting to 0");
+                PluginLog.LogDebug("--------------------------------------------------------------------");
+                MsBuilder = 0;
+            }
+
+            if (MsBuilder >= UpdateOnNumOfMs) // Update padlock settings from config each 1000 millisecond i.e update settings from config on each second.
+            {
+                UpdateSettings();
+                MsBuilder = 0;
+            }
+        }
+
+        private unsafe void UpdateSettings() 
+        {
+            if (GrabAddon())
+            {
+                if (Padlock->IsVisible != Configuration.Lock_isVisible)
+                {
+                    Padlock->ToggleVisibility(Configuration.Lock_isVisible);
+                    PluginLog.LogDebug("Grabbed Lock_isVisible from config");
+                }
+                if (Padlock->Color.A != (byte)(255 * Configuration.Lock_Opacity))
+                {
+                    Padlock->Color.A = (byte)(255 * Configuration.Lock_Opacity);
+                    PluginLog.LogDebug("Grabbed Lock_Opacity from config");
+                }
+            }
+        }
+
+        private unsafe bool GrabAddon()
         {
             if (Addon == null)
             {
@@ -82,21 +128,12 @@ namespace HidePadlock
             return false;
         }
 
-        public unsafe void OnLoad()
-        {
-            if (GrabAddon())
-            {
-                Padlock->ToggleVisibility(Configuration.Lock_isVisible);
-                Padlock->Color.A = (byte)(255 * Configuration.Lock_Opacity);
-            }
-        }
-
         public unsafe void Lock_isVisible()
         {
             if (GrabAddon())
             {
                 Padlock->ToggleVisibility(Configuration.Lock_isVisible = !Configuration.Lock_isVisible);
-                PluginLog.Log($"Addon _ActionBar, NodeId: {Padlock_NodeId}, aka Padlock, IsVisible: {Configuration.Lock_isVisible}");
+                PluginLog.LogDebug($"Addon _ActionBar, NodeId: {Padlock_NodeId}, aka Padlock, IsVisible: {Configuration.Lock_isVisible}");
             }
         }
 
@@ -105,24 +142,25 @@ namespace HidePadlock
             if (GrabAddon())
             {
                 Padlock->Color.A = (byte)(255 * Configuration.Lock_Opacity);
-                PluginLog.Log($"Addon _ActionBar, NodeId: {Padlock_NodeId}, aka Padlock, Opacity: {Configuration.Lock_Opacity}");
+                PluginLog.LogDebug($"Addon _ActionBar, NodeId: {Padlock_NodeId}, aka Padlock, Opacity: {Configuration.Lock_Opacity}");
             }
         }
 
-        public unsafe void Lock_Restore()
+        private unsafe void Lock_Restore()
         {
             if (GrabAddon())
             {
                 Padlock->ToggleVisibility(true);
                 Padlock->Color.A = 255;
-                PluginLog.Log($"Addon _ActionBar, NodeId: {Padlock_NodeId}, aka Padlock, Restored to default");
+                PluginLog.LogDebug($"Addon _ActionBar, NodeId: {Padlock_NodeId}, aka Padlock, restored to default values");
             }
         }
 
         public void Dispose()
         {
-            Lock_Restore();
             PluginUi.Dispose();
+            Framework.Update -= FrameworkOnOnUpdateEvent;
+            Lock_Restore();
             CommandManager.RemoveHandler(CommandName);
             CommandManager.RemoveHandler(CommandName2);
         }

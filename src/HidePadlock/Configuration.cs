@@ -8,9 +8,7 @@ namespace HidePadlock
     public class Configuration : IPluginConfiguration
     {
         public int Version { get; set; }
-
         public bool Lock_isVisible { get; set; } = true;
-
         public float Lock_Opacity { get; set; } = 1;
 
         [NonSerialized]

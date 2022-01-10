@@ -63,7 +63,7 @@ namespace HidePadlock
                     float refFloat = Configuration.Lock_Opacity;
                     float minValue = 0.1f;
                     float maxValue = 1.0f;
-                    if (ImGui.DragFloat("Opacity", ref refFloat, .005f, minValue, maxValue, "%.1f"))
+                    if (ImGui.SliderFloat("Opacity", ref refFloat, minValue, maxValue, "%.1f"))
                     {
                         Configuration.Lock_Opacity = refFloat;
                         Plugin.Lock_Opacity();
