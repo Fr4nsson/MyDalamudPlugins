@@ -24,6 +24,7 @@ namespace HidePadlock
         private CommandManager CommandManager { get; init; }
         private Configuration Configuration { get; init; }
         private static int MsBuilder { get; set; }
+        private static int CurrentMs { get; set; }
         private unsafe AtkUnitBase* Addon { get; set; } = null;
         private unsafe AtkResNode* Padlock { get; set; } = null;
 
@@ -65,12 +66,13 @@ namespace HidePadlock
 
         private void FrameworkOnOnUpdateEvent(Framework framework)
         {
-            int currentMs = 0;
-            int previousMs = currentMs;
-            currentMs = DateTime.Now.Millisecond;
+            int previousMs = CurrentMs;
+            CurrentMs = DateTime.Now.Millisecond;
+            //PluginLog.LogDebug($"Current ms: {CurrentMs}");
 
-            int delayInMsBetweenTicks = currentMs - previousMs;
-            if (currentMs < previousMs) delayInMsBetweenTicks = 999 + currentMs - previousMs; // DateTime.Millisecond max is 999
+            int delayInMsBetweenTicks = CurrentMs - previousMs;
+            if (CurrentMs < previousMs) delayInMsBetweenTicks = 999 + CurrentMs - previousMs; // DateTime.Millisecond max is 999
+            //PluginLog.LogDebug($"Delay between ticks: {delayInMsBetweenTicks} ms");
 
             MsBuilder += delayInMsBetweenTicks;
 
@@ -84,6 +86,9 @@ namespace HidePadlock
 
             if (MsBuilder >= UpdateOnNumOfMs) // Update padlock settings from config each 1000 millisecond i.e update settings from config on each second.
             {
+                //PluginLog.LogDebug($"-------------------------------------------------------");
+                //PluginLog.LogDebug($"If you see this message then {MsBuilder} ms has passed.");
+                //PluginLog.LogDebug($"-------------------------------------------------------");
                 UpdateSettings();
                 MsBuilder = 0;
             }
