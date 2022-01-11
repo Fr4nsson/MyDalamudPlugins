@@ -120,22 +120,11 @@ namespace HidePadlock
 
         private unsafe bool GrabAddon()
         {
-            if (Addon == null)
-            {
-                Addon = (AtkUnitBase*)GameGui.GetAddonByName("_ActionBar", 1);
-            }
-
+            Addon = (AtkUnitBase*)GameGui.GetAddonByName("_ActionBar", 1);
             if (Addon != null)
             {
-                if (Padlock == null)
-                {
-                    Padlock = Addon->GetNodeById(Padlock_NodeId);
-                }
-
-                if (Padlock != null)
-                {
-                    return true;
-                }
+                Padlock = Addon->GetNodeById(Padlock_NodeId);
+                return true;
             }
             return false;
         }
