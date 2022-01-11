@@ -1,4 +1,5 @@
 ﻿using Dalamud.Game;
+using Dalamud.Game.ClientState;
 using Dalamud.Game.Command;
 using Dalamud.Game.Gui;
 using Dalamud.IoC;
@@ -21,6 +22,7 @@ namespace HidePadlock
         private GameGui GameGui { get; init; }
         private PluginUI PluginUi { get; init; }
         private Framework Framework { get; set; }
+        private ClientState ClientState { get; set; }
         private CommandManager CommandManager { get; init; }
         private Configuration Configuration { get; init; }
         private static int MsBuilder { get; set; }
@@ -36,11 +38,13 @@ namespace HidePadlock
             [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
             [RequiredVersion("1.0")] GameGui gameGui,
             [RequiredVersion("1.0")] Framework framework,
+            [RequiredVersion("1.0")] ClientState clientState,
             [RequiredVersion("1.0")] CommandManager commandManager)
         {
             PluginInterface = pluginInterface;
             GameGui = gameGui;
             Framework = framework;
+            ClientState = clientState;
             CommandManager = commandManager;
 
             Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
@@ -66,31 +70,34 @@ namespace HidePadlock
 
         private void FrameworkOnOnUpdateEvent(Framework framework)
         {
-            int previousMs = CurrentMs;
-            CurrentMs = DateTime.Now.Millisecond;
-            //PluginLog.LogDebug($"Current ms: {CurrentMs}");
-
-            int delayInMsBetweenTicks = CurrentMs - previousMs;
-            if (CurrentMs < previousMs) delayInMsBetweenTicks = 999 + CurrentMs - previousMs; // DateTime.Millisecond max is 999
-            //PluginLog.LogDebug($"Delay between ticks: {delayInMsBetweenTicks} ms");
-
-            MsBuilder += delayInMsBetweenTicks;
-
-            if (MsBuilder < 0)
+            if (ClientState.IsLoggedIn)
             {
-                PluginLog.LogDebug("--------------------------------------------------------------------");
-                PluginLog.LogDebug("MsBuilder was less than zero, this should not happen, resetting to 0");
-                PluginLog.LogDebug("--------------------------------------------------------------------");
-                MsBuilder = 0;
-            }
+                int previousMs = CurrentMs;
+                CurrentMs = DateTime.Now.Millisecond;
+                //PluginLog.LogDebug($"Current ms: {CurrentMs}");
 
-            if (MsBuilder >= UpdateOnNumOfMs) // Update padlock settings from config each 1000 millisecond i.e update settings from config on each second.
-            {
-                //PluginLog.LogDebug($"-------------------------------------------------------");
-                //PluginLog.LogDebug($"If you see this message then {MsBuilder} ms has passed.");
-                //PluginLog.LogDebug($"-------------------------------------------------------");
-                UpdateSettings();
-                MsBuilder = 0;
+                int delayInMsBetweenTicks = CurrentMs - previousMs;
+                if (CurrentMs < previousMs) delayInMsBetweenTicks = 999 + CurrentMs - previousMs; // DateTime.Millisecond max is 999
+                //PluginLog.LogDebug($"Delay between ticks: {delayInMsBetweenTicks} ms");
+
+                MsBuilder += delayInMsBetweenTicks;
+
+                if (MsBuilder < 0)
+                {
+                    PluginLog.LogDebug("--------------------------------------------------------------------");
+                    PluginLog.LogDebug("MsBuilder was less than zero, this should not happen, resetting to 0");
+                    PluginLog.LogDebug("--------------------------------------------------------------------");
+                    MsBuilder = 0;
+                }
+
+                if (MsBuilder >= UpdateOnNumOfMs) // Update padlock settings from config each 1000 millisecond i.e update settings from config on each second.
+                {
+                    //PluginLog.LogDebug($"-------------------------------------------------------");
+                    //PluginLog.LogDebug($"If you see this message then {MsBuilder} ms has passed.");
+                    //PluginLog.LogDebug($"-------------------------------------------------------");
+                    UpdateSettings();
+                    MsBuilder = 0;
+                }
             }
         }
 
