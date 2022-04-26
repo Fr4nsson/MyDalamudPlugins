@@ -17,4 +17,5 @@ https://raw.githubusercontent.com/Fr4nsson/MyDalamudPlugins/main/pluginmaster.js
 ## Plugins
 | Name | Description |
 |---------------|-----------------|
+| [Hide Padlock](https://github.com/Fr4nsson/MyDalamudPlugins/tree/main/src/HidePadlock) | Allows you to toggle the visibility of the padlock that is next to hotbar one.<br><br>Use /padlock to toggle visibility.<br>Use //padlock to open settings. |
 
