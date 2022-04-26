@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<Version>1.3.0.0</Version>
+		<Version>1.4.0.0</Version>
 		<Authors>Fr4nsson</Authors>
 		<Company>Fr4nsson</Company>
 		<RootNamespace>HidePadlock</RootNamespace>
@@ -93,7 +93,7 @@
 			<CopyAssemblies Include="$(TargetDir)$(AssemblyName)\$(AssemblyName).json" />
 			<CopyAssemblies Include="$(TargetDir)$(AssemblyName)\latest.zip" />
 		</ItemGroup>
-		<Copy SourceFiles="@(CopyAssemblies)" DestinationFolder="D:\Git Projects\MyDalamudPlugins\plugins\$(AssemblyName)" ContinueOnError="true" />
+		<Copy SourceFiles="@(CopyAssemblies)" DestinationFolder="C:\Github\MyDalamudPlugins\plugins\$(AssemblyName)" ContinueOnError="true" />
 		<Message Text="Copying @(CopyAssemblies)" Importance="high" />
 	</Target>
 	
